@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="el">
 <head>
@@ -94,9 +95,8 @@
     <span>🎟️ ΕΙΣΙΤΗΡΙΑ · TICKET DROPS</span>
     <span>🌍 ΠΑΓΚΟΣΜΙΑ ΚΑΛΥΨΗ · 5 ΛΕΠΤΑ ΑΝΑΝΕΩΣΗ</span>
     <span>🍀 PAOALERT — LIVE NEWS ΠΑΝΑΘΗΝΑΪΚΟΣ</span>
-    <span>⚽ ΠΑΟ FC · SUPER LEAGUE</span>
-    <span>🏀 ΠΑΟ BC · EUROLEAGUE</span>
-    <span>👩 ΓΥΝΑΙΚΕΙΟ ΤΜΗΜΑ</span>
+    <span>⚽ ΠΑΟ FC</span><span>🏀 ΠΑΟ BC · EUROLEAGUE</span>
+    <span>👩 ΓΥΝΑΙΚΕΙΟ</span>
   </div>
 </div>
 
@@ -157,94 +157,66 @@
 </div>
 
 <script>
+// Cloudflare Worker proxy — no cache, real-time
 const PROXY='https://paoalert-proxy.nikosdim982.workers.dev/?url=';
 
-// ==========================================
-// CATEGORY DETECTION — ORDER MATTERS
-// Women is checked FIRST, overrides everything
-// ==========================================
-
-// If ANY of these words appear → WOMEN category
-const WOMEN_W=['γυναικείο','γυναικεία','γυναίκες','γυναικών','women','woman','female','girls','ladies','κορίτσι','γυναίκα'];
-
-// Basketball words
-const BBALL_W=['euroleague','aktor','pao bc','paobc','μπάσκετ','μπάσκετμπολ','basketball','basket league','greek league basketball','nbg'];
-
-// Volleyball words  
+const WOMEN_W=['γυναικείο','γυναικεία','γυναίκες','γυναικών','women','woman','female','girls','ladies'];
+const BBALL_W=['euroleague','aktor','pao bc','paobc','μπάσκετ','basketball','basket league'];
 const VBALL_W=['βόλεϊ','βολεϊ','volleyball','volley'];
-
-// Ticket words
 const TICKET_W=['εισιτήρι','εισιτηρίων','ticket','tickets'];
+const PAO_W=['παναθηναϊκ','panathinaikos','paobc','pao bc','τριφύλλι','trefoil'];
 
-// PAO keywords — article must mention PAO to be included
-const PAO_W=['παναθηναϊκ','panathinaikos','paobc','pao bc','τριφύλλι','trefoil','leoforos'];
-
-// FEEDS — each one targets specific content
 const FEEDS=[
-  // === WOMEN ===
   {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+γυναικείο&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'women'},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos+women+football&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'women'},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos+women+basketball&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'women'},
-  // === BASKETBALL ===
+  {url:'https://news.google.com/rss/search?q=Panathinaikos+women&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'women'},
   {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+μπάσκετ&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'basketball'},
   {url:'https://news.google.com/rss/search?q=Panathinaikos+euroleague&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'basketball'},
   {url:'https://news.google.com/rss/search?q=Panathinaikos+basketball&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'basketball'},
-  {url:'https://www.paobc.gr/feed',label:'PAO BC Official',source:'paobc.gr',force:'basketball'},
-  {url:'https://feeds.feedburner.com/EuroleagueBasketball',label:'Euroleague',source:'euroleague.net',force:'basketball'},
-  // === VOLLEYBALL ===
   {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+βόλεϊ&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'volleyball'},
-  // === TICKETS ===
   {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+εισιτήρια&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'tickets'},
   {url:'https://news.google.com/rss/search?q=Panathinaikos+tickets&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'tickets'},
-  // === FOOTBALL (general PAO news) ===
   {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+ποδόσφαιρο&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'football'},
   {url:'https://news.google.com/rss/search?q=Panathinaikos+football&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'football'},
-  {url:'https://www.pao.gr/feed',label:'PAO FC Official',source:'pao.gr',force:'football'},
-  // === GENERAL (auto-detect) ===
   {url:'https://news.google.com/rss/search?q=Παναθηναϊκός&hl=el&gl=GR&ceid=GR:el',label:'Google News GR',source:'news.google.com',force:null},
   {url:'https://news.google.com/rss/search?q=Panathinaikos&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:null},
   {url:'https://www.sport-fm.gr/rss/all',label:'Sport FM',source:'sport-fm.gr',force:null},
   {url:'https://www.sdna.gr/feed',label:'SDNA',source:'sdna.gr',force:null},
   {url:'https://www.gazzetta.gr/rss/all',label:'Gazzetta',source:'gazzetta.gr',force:null},
   {url:'https://www.sport24.gr/rss/all',label:'Sport24',source:'sport24.gr',force:null},
+  {url:'https://www.pao.gr/feed',label:'PAO FC Official',source:'pao.gr',force:'football'},
+  {url:'https://www.paobc.gr/feed',label:'PAO BC Official',source:'paobc.gr',force:'basketball'},
+  {url:'https://feeds.feedburner.com/EuroleagueBasketball',label:'Euroleague',source:'euroleague.net',force:'basketball'},
 ];
 
 let allNews=[],activeCategory='all',seenUrls=new Set(),isLoading=false;
 
 function clean(h){return(h||'').replace(/<!\[CDATA\[|\]\]>/g,'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim()}
+function has(text,words){const t=(text||'').toLowerCase();return words.some(w=>t.includes(w))}
+function isPAO(t){return has(t,PAO_W)}
 
-function contains(text,words){const t=(text||'').toLowerCase();return words.some(w=>t.includes(w))}
-
-function isPAO(text){return contains(text,PAO_W)}
-
-// Smart category detection
-function detectCategory(text, forced){
-  // WOMEN always wins — if text mentions women it goes to women
-  if(contains(text,WOMEN_W))return'women';
-  // If forced category set (from feed), use it
+function detectCat(text,forced){
+  if(has(text,WOMEN_W))return'women';
   if(forced)return forced;
-  // Auto detect from text
   const t=(text||'').toLowerCase();
-  if(contains(text,TICKET_W))return'tickets';
-  if(contains(text,BBALL_W))return'basketball';
-  if(contains(text,VBALL_W))return'volleyball';
+  if(has(text,TICKET_W))return'tickets';
+  if(has(text,BBALL_W))return'basketball';
+  if(has(text,VBALL_W))return'volleyball';
   return'football';
 }
 
-function getCatEmoji(c){return{football:'⚽',basketball:'🏀',volleyball:'🏐',tickets:'🎟️',women:'👩'}[c]||'🍀'}
+function getEmoji(c){return{football:'⚽',basketball:'🏀',volleyball:'🏐',tickets:'🎟️',women:'👩'}[c]||'🍀'}
 
 function getTag(text,cat){
   if(cat==='women')return{tag:'ΓΥΝΑΙΚΕΙΟ',color:'#ec4899'};
   const t=(text||'').toLowerCase();
   if(t.includes('μεταγραφ')||t.includes('transfer')||t.includes('signing'))return{tag:'ΜΕΤΑΓΡΑΦΗ',color:'#f59e0b'};
   if(t.includes('τραυματ')||t.includes('injur'))return{tag:'ΤΡΑΥΜΑΤΙΣΜΟΣ',color:'#ef4444'};
-  if(contains(text,TICKET_W))return{tag:'TICKET',color:'#22c55e'};
-  if(t.includes('νίκη')||t.includes('wins')||t.includes('victory')||t.includes('beats'))return{tag:'ΝΙΚΗ',color:'#22c55e'};
+  if(has(text,TICKET_W))return{tag:'TICKET',color:'#22c55e'};
+  if(t.includes('νίκη')||t.includes('wins')||t.includes('victory'))return{tag:'ΝΙΚΗ',color:'#22c55e'};
   if(t.includes('ήττα')||t.includes('loses'))return{tag:'ΗΤΤΑ',color:'#ef4444'};
   if(t.includes('επίσημ')||t.includes('official'))return{tag:'ΕΠΙΣΗΜΟ',color:'#8b5cf6'};
   if(t.includes('breaking'))return{tag:'BREAKING',color:'#ef4444'};
   if(t.includes('δηλώσεις')||t.includes('statement')||t.includes('said'))return{tag:'ΔΗΛΩΣΕΙΣ',color:'#a78bfa'};
-  if(t.includes('vs')||t.includes('αγώνας')||t.includes('ματς')||t.includes('match'))return{tag:'ΑΓΩΝΑΣ',color:'#3b82f6'};
   return{tag:'ΕΙΔΗΣΗ',color:'#3b82f6'};
 }
 
@@ -260,31 +232,26 @@ function timeAgo(d){
 
 async function fetchFeed(feed){
   try{
-    const res=await fetch(PROXY+encodeURIComponent(feed.url),{signal:AbortSignal.timeout(9000)});
+    const res=await fetch(PROXY+encodeURIComponent(feed.url),{signal:AbortSignal.timeout(10000)});
     const data=await res.json();
     if(!data.items||!data.items.length)return[];
     const items=[];
     for(const item of data.items.slice(0,20)){
       const title=clean(item.title||'');
-      const desc=clean(item.description||item.content||'');
+      const desc=clean(item.description||'');
       const full=title+' '+desc;
-      // Skip if not about PAO (unless official site)
       const official=feed.source.includes('pao.gr')||feed.source.includes('paobc.gr');
       if(!official&&!isPAO(full))continue;
-      // Skip duplicates
       const link=item.link||'#';
       if(seenUrls.has(link))continue;
       seenUrls.add(link);
-      const cat=detectCategory(full,feed.force);
+      const cat=detectCat(full,feed.force);
       const{tag,color}=getTag(full,cat);
       items.push({
         id:link,category:cat,tag,tagColor:color,
-        title,
-        summary:desc.slice(0,200)+(desc.length>200?'...':''),
-        fullContent:desc,
-        source:feed.source,sourceLabel:feed.label,
-        time:timeAgo(item.pubDate),
-        pubDate:item.pubDate||new Date().toISOString(),
+        title,summary:desc.slice(0,200)+(desc.length>200?'...':''),
+        fullContent:desc,source:feed.source,sourceLabel:feed.label,
+        time:timeAgo(item.pubDate),pubDate:item.pubDate||new Date().toISOString(),
         link,isNew:true
       });
     }
@@ -305,11 +272,9 @@ async function fetchAllNews(){
   const results=await Promise.allSettled(FEEDS.map(fetchFeed));
   const newItems=[];
   results.forEach(r=>{if(r.status==='fulfilled')newItems.push(...r.value)});
-  // Merge, deduplicate by link, sort newest first
   const allMap=new Map();
   [...newItems,...allNews].forEach(n=>allMap.set(n.id,n));
   allNews=Array.from(allMap.values()).sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate)).slice(0,300);
-  // Counts
   const counts={all:allNews.length,football:0,basketball:0,volleyball:0,tickets:0,women:0};
   allNews.forEach(n=>{if(counts[n.category]!==undefined)counts[n.category]++});
   Object.keys(counts).forEach(k=>{const el=document.getElementById('count-'+k);if(el)el.textContent=counts[k]});
@@ -323,7 +288,6 @@ async function fetchAllNews(){
   }
   const now=new Date().toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});
   document.getElementById('statusBar').innerHTML=`<span style="color:#4ade80" class="blink">●</span> Ενημέρωση: ${now} · ${allNews.length} άρθρα${added>0&&prevCount>0?` · <span style="color:#4ade80;font-weight:700">+${added} νέα!</span>`:''} · Επόμενη σε 5 λεπτά`;
-  // Timer bar
   const tp=document.getElementById('timerProgress');
   tp.style.transition='none';tp.style.width='100%';
   setTimeout(()=>{tp.style.transition='width 300s linear';tp.style.width='0%'},100);
@@ -337,7 +301,7 @@ function renderFeed(){
   if(filtered.length===0){feed.innerHTML='<div class="empty">Δεν βρέθηκαν νέα.<br>Δοκίμασε ανανέωση!</div>';return}
   feed.innerHTML=filtered.map((item,i)=>`
     <div class="card ${i<3?'hot':''} ${item.isNew?'isnew':''} ${item.category==='women'?'women-card':''}" style="animation-delay:${Math.min(i*0.03,0.6)}s">
-      <div class="card-emoji">${getCatEmoji(item.category)}</div>
+      <div class="card-emoji">${getEmoji(item.category)}</div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag" style="color:${item.tagColor};background:${item.tagColor}18;border:1px solid ${item.tagColor}35">${item.tag}</span>
@@ -368,7 +332,7 @@ function openModal(encodedId){
   const id=decodeURIComponent(encodedId);
   const item=allNews.find(n=>n.id===id);
   if(!item)return;
-  document.getElementById('modalTags').innerHTML=`<span class="tag" style="color:${item.tagColor};background:${item.tagColor}18;border:1px solid ${item.tagColor}35">${item.tag}</span><span style="font-size:11px;color:#6b7280;font-family:'Barlow Condensed'">${getCatEmoji(item.category)} ${item.sourceLabel}</span>`;
+  document.getElementById('modalTags').innerHTML=`<span class="tag" style="color:${item.tagColor};background:${item.tagColor}18;border:1px solid ${item.tagColor}35">${item.tag}</span><span style="font-size:11px;color:#6b7280;font-family:'Barlow Condensed'">${getEmoji(item.category)} ${item.sourceLabel}</span>`;
   document.getElementById('modalTitle').textContent=item.title;
   document.getElementById('modalMeta').innerHTML=`<span>🕐 ${item.time}</span><span>📎 ${item.source}</span>`;
   document.getElementById('modalBody').textContent=item.fullContent||item.summary||'Κλικ παρακάτω για να διαβάσεις ολόκληρο το άρθρο.';
