@@ -1,335 +1,392 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PaoAlert - Live News ΠΑΟ</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PaoAlert - Live News Παναθηναϊκός</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@700;800;900&display=swap');
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #080f08; color: #e5e7eb; font-family: 'Barlow', sans-serif; min-height: 100vh; }
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-thumb { background: #1a3a1a; border-radius: 4px; }
-
-    .ticker { background: #15803d; padding: 6px 20px; font-family: 'Barlow Condensed'; font-size: 12px; color: #fff; letter-spacing: 1px; display: flex; gap: 24px; overflow-x: auto; white-space: nowrap; }
-    
-    .header { background: linear-gradient(180deg, #0d2a0d, #080f08); border-bottom: 2px solid #15803d; padding: 16px 20px; }
-    .header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-    .logo-box { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #15803d, #4ade80); display: flex; align-items: center; justify-content: center; font-size: 26px; }
-    .logo-text { font-family: 'Barlow Condensed'; font-weight: 900; font-size: 28px; color: #fff; line-height: 1; }
-    .logo-text span { color: #4ade80; }
-    .live-badge { font-size: 11px; color: #4ade80; font-family: 'Barlow Condensed'; letter-spacing: 2px; margin-top: 2px; }
-    .refresh-btn { background: #15803d; color: #fff; border: none; padding: 9px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; font-family: 'Barlow Condensed'; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
-    .refresh-btn:hover { background: #16a34a; }
-    .refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .main { max-width: 860px; margin: 0 auto; padding: 16px; }
-
-    .sources { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .source-pill { display: flex; align-items: center; gap: 4px; font-size: 11px; font-family: 'Barlow Condensed'; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 6px; border: 1px solid #1a3a1a; }
-    .source-dot { width: 8px; height: 8px; border-radius: 50%; background: #4b5563; }
-    .source-dot.ok { background: #4ade80; }
-    .source-dot.error { background: #ef4444; }
-
-    .cats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .cat-btn { border: 1px solid #1a3a1a; color: #9ca3af; padding: 7px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: 'Barlow'; background: rgba(255,255,255,0.05); cursor: pointer; transition: all 0.15s; }
-    .cat-btn.active { background: #15803d; color: #fff; border-color: #15803d; }
-    .cat-btn:hover { opacity: 0.8; }
-
-    .status-bar { font-size: 12px; color: #4b5563; margin-bottom: 14px; font-family: 'Barlow Condensed'; }
-
-    .feed { display: flex; flex-direction: column; gap: 8px; }
-    .card { background: #0d1a0d; border: 1px solid #131f13; border-radius: 14px; padding: 13px 15px; cursor: pointer; transition: all 0.2s; display: flex; gap: 10px; align-items: flex-start; animation: fadeIn 0.3s ease forwards; opacity: 0; }
-    .card.hot { background: rgba(34,197,94,0.05); border-color: #1a5c1a; }
-    .card:hover { background: rgba(34,197,94,0.07); transform: translateX(3px); }
-    .card-emoji { font-size: 20px; margin-top: 1px; flex-shrink: 0; }
-    .card-body { flex: 1; min-width: 0; }
-    .card-tags { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; flex-wrap: wrap; }
-    .tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px; font-family: 'Barlow Condensed'; letter-spacing: 1px; }
-    .hot-badge { font-size: 10px; color: #f59e0b; font-family: 'Barlow Condensed'; font-weight: 700; }
-    .card-title { font-size: 15px; font-weight: 700; color: #f3f4f6; margin-bottom: 3px; line-height: 1.35; font-family: 'Barlow Condensed'; }
-    .card-summary { font-size: 12px; color: #6b7280; line-height: 1.5; margin-bottom: 6px; }
-    .card-meta { display: flex; gap: 12px; font-size: 11px; color: #4b5563; font-family: 'Barlow Condensed'; }
-    .card-meta .read { color: #4ade80; }
-
-    .shimmer { background: linear-gradient(90deg, #0d1a0d 25%, #1a3a1a 50%, #0d1a0d 75%); background-size: 800px 100%; animation: shimmer 1.5s infinite; border-radius: 14px; height: 80px; margin-bottom: 8px; }
-
-    .adsense { margin-top: 24px; background: #0d1a0d; border: 1px dashed #1a3a1a; border-radius: 12px; padding: 20px; text-align: center; color: #374151; font-size: 12px; font-family: 'Barlow Condensed'; letter-spacing: 1px; }
-    .footer { text-align: center; margin-top: 14px; font-size: 11px; color: #1f2937; font-family: 'Barlow Condensed'; letter-spacing: 1px; padding-bottom: 20px; }
-
-    /* Modal */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .modal-overlay.hidden { display: none; }
-    .modal { background: #0d1a0d; border: 1px solid #1a3a1a; border-radius: 20px; max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 24px; }
-    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-    .close-btn { cursor: pointer; background: #1a3a1a; border: none; color: #fff; width: 32px; height: 32px; border-radius: 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .close-btn:hover { background: #15803d; }
-    .modal-title { font-family: 'Barlow Condensed'; font-weight: 800; font-size: 22px; color: #fff; line-height: 1.3; margin-bottom: 8px; }
-    .modal-time { font-size: 12px; color: #4b5563; font-family: 'Barlow Condensed'; margin-bottom: 14px; }
-    .modal-img { width: 100%; border-radius: 12px; margin-bottom: 16px; max-height: 250px; object-fit: cover; }
-    .modal-content { font-size: 14px; color: #9ca3af; line-height: 1.7; margin-bottom: 20px; }
-    .modal-link { display: block; background: #15803d; color: #fff; text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-family: 'Barlow Condensed'; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
-    .modal-link:hover { background: #16a34a; }
-
-    .empty { text-align: center; padding: 40px; color: #4b5563; font-family: 'Barlow Condensed'; font-size: 16px; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-    .blink { animation: blink 1.2s infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .spin { display: inline-block; animation: spin 1s linear infinite; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#080f08;color:#e5e7eb;font-family:'Barlow',sans-serif;min-height:100vh}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#1a3a1a;border-radius:4px}
+    .ticker-wrap{overflow:hidden;background:#15803d;padding:7px 0}
+    .ticker{display:inline-flex;gap:50px;animation:ticker 40s linear infinite;white-space:nowrap;font-family:'Barlow Condensed';font-size:12px;color:#fff;letter-spacing:1px;padding-left:100%}
+    @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+    .header{background:linear-gradient(180deg,#0d2a0d,#080f08);border-bottom:2px solid #15803d;padding:16px 20px;position:sticky;top:0;z-index:100}
+    .header-inner{max-width:980px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .logo-wrap{display:flex;align-items:center;gap:12px}
+    .logo-icon{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#15803d,#4ade80);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .logo-name{font-family:'Barlow Condensed';font-weight:900;font-size:30px;color:#fff;line-height:1}
+    .logo-name span{color:#4ade80}
+    .logo-sub{font-size:11px;color:#4ade80;font-family:'Barlow Condensed';letter-spacing:2px;margin-top:2px}
+    .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .news-count{background:#15803d;color:#fff;font-size:12px;padding:5px 12px;border-radius:20px;font-family:'Barlow Condensed';font-weight:700}
+    .new-alert{background:#ef4444;color:#fff;font-size:12px;padding:5px 12px;border-radius:20px;font-family:'Barlow Condensed';font-weight:700;animation:pulse 1s infinite;display:none}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+    .refresh-btn{background:#15803d;color:#fff;border:none;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:700;font-family:'Barlow Condensed';cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s}
+    .refresh-btn:hover{background:#16a34a}
+    .refresh-btn:disabled{opacity:0.6;cursor:not-allowed}
+    .timer-bar{height:3px;background:#1a3a1a}
+    .timer-progress{height:100%;background:#4ade80;width:100%;transition:none}
+    .main{max-width:980px;margin:0 auto;padding:16px}
+    .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .cat-btn{border:1px solid #1a3a1a;color:#9ca3af;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:600;font-family:'Barlow';background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px}
+    .cat-btn.active{background:#15803d;color:#fff;border-color:#15803d}
+    .cat-btn.active.women-btn{background:#be185d;border-color:#be185d}
+    .cat-btn:hover{opacity:0.85}
+    .cat-count{background:rgba(255,255,255,0.2);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700}
+    .status-bar{font-size:12px;color:#4b5563;margin-bottom:14px;font-family:'Barlow Condensed';display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .feed{display:flex;flex-direction:column;gap:8px}
+    .card{background:#0d1a0d;border:1px solid #131f13;border-radius:14px;padding:14px 16px;transition:all 0.2s;display:flex;gap:12px;align-items:flex-start;animation:fadeIn 0.35s ease forwards;opacity:0}
+    .card.hot{background:rgba(34,197,94,0.05);border-color:#1a5c1a}
+    .card.isnew{border-color:#22c55e}
+    .card.women-card{border-color:#831843;background:rgba(190,24,93,0.04)}
+    .card:hover{background:rgba(34,197,94,0.08);transform:translateX(3px)}
+    .card-emoji{font-size:22px;margin-top:2px;flex-shrink:0}
+    .card-body{flex:1;min-width:0}
+    .card-tags{display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap}
+    .tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;font-family:'Barlow Condensed';letter-spacing:1px}
+    .hot-badge{font-size:10px;color:#f59e0b;font-family:'Barlow Condensed';font-weight:700}
+    .new-badge{font-size:10px;color:#4ade80;font-family:'Barlow Condensed';font-weight:700;animation:blink 1s infinite}
+    .card-title{font-size:15px;font-weight:700;color:#f3f4f6;margin-bottom:4px;line-height:1.35;font-family:'Barlow Condensed'}
+    .card-summary{font-size:13px;color:#6b7280;line-height:1.55;margin-bottom:7px}
+    .card-meta{display:flex;gap:10px;font-size:11px;color:#4b5563;font-family:'Barlow Condensed';flex-wrap:wrap}
+    .read-btn{color:#4ade80!important;cursor:pointer;background:none;border:none;font-family:'Barlow Condensed';font-size:11px;font-weight:700;padding:0}
+    .orig-btn{color:#6b7280!important;cursor:pointer;background:none;border:none;font-family:'Barlow Condensed';font-size:11px;padding:0;text-decoration:none}
+    .orig-btn:hover{color:#9ca3af!important}
+    .shimmer{background:linear-gradient(90deg,#0d1a0d 25%,#1a3a1a 50%,#0d1a0d 75%);background-size:800px 100%;animation:shimmer 1.5s infinite;border-radius:14px;height:85px;margin-bottom:8px}
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.hidden{display:none}
+    .modal{background:#0a140a;border:1px solid #1a3a1a;border-radius:20px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
+    .modal-header{padding:20px 24px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:#0a140a;border-bottom:1px solid #1a3a1a}
+    .modal-header-left{flex:1}
+    .modal-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+    .modal-title{font-family:'Barlow Condensed';font-weight:900;font-size:22px;color:#fff;line-height:1.3}
+    .modal-meta{font-size:12px;color:#4b5563;font-family:'Barlow Condensed';display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .close-btn{cursor:pointer;background:#1a3a1a;border:none;color:#fff;width:36px;height:36px;border-radius:10px;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
+    .close-btn:hover{background:#15803d}
+    .modal-body{padding:20px 24px;font-size:14px;color:#9ca3af;line-height:1.8;flex:1}
+    .modal-footer{padding:16px 24px;border-top:1px solid #1a3a1a;display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#0a140a}
+    .btn-read{flex:1;background:#15803d;color:#fff;text-align:center;padding:13px;border-radius:12px;text-decoration:none;font-family:'Barlow Condensed';font-weight:700;font-size:15px;transition:background 0.2s;border:none;cursor:pointer;display:block}
+    .btn-read:hover{background:#16a34a}
+    .btn-source{flex:1;background:transparent;color:#4ade80;text-align:center;padding:13px;border-radius:12px;text-decoration:none;font-family:'Barlow Condensed';font-weight:700;font-size:15px;border:1px solid #1a5c1a;transition:all 0.2s;display:block}
+    .btn-source:hover{background:rgba(74,222,128,0.08)}
+    .empty{text-align:center;padding:50px 20px;color:#4b5563;font-family:'Barlow Condensed';font-size:16px;line-height:2}
+    .adsense{margin-top:28px;background:#0d1a0d;border:1px dashed #1a3a1a;border-radius:12px;padding:22px;text-align:center;color:#374151;font-size:12px;font-family:'Barlow Condensed';letter-spacing:1px}
+    .footer{text-align:center;margin-top:16px;padding-bottom:24px;font-size:11px;color:#1f2937;font-family:'Barlow Condensed';letter-spacing:1px}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+    .blink{animation:blink 1.2s infinite}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .spin{display:inline-block;animation:spin 1s linear infinite}
   </style>
 </head>
 <body>
 
-<!-- Ticker -->
-<div class="ticker">
-  <span>🍀 PAOALERT</span>
-  <span>⚽ ΠΑΟ FC</span>
-  <span>🏀 ΠΑΟ BC</span>
-  <span>🏐 ΒΟΛΕΪ</span>
-  <span>🎟️ ΕΙΣΙΤΗΡΙΑ</span>
-  <span>🌍 EUROLEAGUE</span>
-  <span>🏆 CHAMPIONS LEAGUE</span>
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>🍀 PAOALERT — LIVE NEWS ΠΑΝΑΘΗΝΑΪΚΟΣ</span>
+    <span>⚽ ΠΑΟ FC · SUPER LEAGUE · EUROPA LEAGUE</span>
+    <span>🏀 ΠΑΟ BC · EUROLEAGUE</span>
+    <span>🏐 ΠΑΟ ΒΟΛΕΪ</span>
+    <span>👩 ΓΥΝΑΙΚΕΙΟ ΤΜΗΜΑ</span>
+    <span>🎟️ ΕΙΣΙΤΗΡΙΑ · TICKET DROPS</span>
+    <span>🌍 ΠΑΓΚΟΣΜΙΑ ΚΑΛΥΨΗ · 5 ΛΕΠΤΑ ΑΝΑΝΕΩΣΗ</span>
+    <span>🍀 PAOALERT — LIVE NEWS ΠΑΝΑΘΗΝΑΪΚΟΣ</span>
+    <span>⚽ ΠΑΟ FC · SUPER LEAGUE</span>
+    <span>🏀 ΠΑΟ BC · EUROLEAGUE</span>
+    <span>👩 ΓΥΝΑΙΚΕΙΟ ΤΜΗΜΑ</span>
+  </div>
 </div>
 
-<!-- Header -->
 <div class="header">
   <div class="header-inner">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div class="logo-box">🍀</div>
+    <div class="logo-wrap">
+      <div class="logo-icon">🍀</div>
       <div>
-        <div class="logo-text">PAO<span>ALERT</span></div>
-        <div class="live-badge"><span class="blink">●</span> LIVE NEWS</div>
+        <div class="logo-name">PAO<span>ALERT</span></div>
+        <div class="logo-sub"><span class="blink">●</span> LIVE · ΠΑΓΚΟΣΜΙΑ ΚΑΛΥΨΗ</div>
       </div>
     </div>
-    <button class="refresh-btn" id="refreshBtn" onclick="fetchNews()">
-      <span id="refreshIcon">🔍</span> Ανανέωση
-    </button>
+    <div class="header-right">
+      <span class="new-alert" id="newAlert">🔥 ΝΕΑ!</span>
+      <span class="news-count" id="newsCount">— νέα</span>
+      <button class="refresh-btn" id="refreshBtn" onclick="fetchAllNews()">
+        <span id="refreshIcon">🔍</span>
+        <span id="refreshText">Ανανέωση</span>
+      </button>
+    </div>
   </div>
+  <div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div>
 </div>
 
-<!-- Main -->
 <div class="main">
-
-  <!-- Sources -->
-  <div class="sources" id="sources">
-    <div class="source-pill"><div class="source-dot" id="dot-sportfm"></div>Sport FM</div>
-    <div class="source-pill"><div class="source-dot" id="dot-sdna"></div>SDNA</div>
-    <div class="source-pill"><div class="source-dot" id="dot-gazzetta"></div>Gazzetta</div>
-    <div class="source-pill"><div class="source-dot" id="dot-sport24"></div>Sport24</div>
-    <div class="source-pill"><div class="source-dot" id="dot-pao"></div>PAO FC</div>
-    <div class="source-pill"><div class="source-dot" id="dot-paobc"></div>PAO BC</div>
-    <div class="source-pill"><div class="source-dot" id="dot-euroleague"></div>Euroleague</div>
-  </div>
-
-  <!-- Categories -->
   <div class="cats">
-    <button class="cat-btn active" onclick="setCategory('all', this)">🍀 Όλα</button>
-    <button class="cat-btn" onclick="setCategory('football', this)">⚽ Ποδόσφαιρο</button>
-    <button class="cat-btn" onclick="setCategory('basketball', this)">🏀 Μπάσκετ</button>
-    <button class="cat-btn" onclick="setCategory('volleyball', this)">🏐 Βόλεϊ</button>
-    <button class="cat-btn" onclick="setCategory('tickets', this)">🎟️ Εισιτήρια</button>
+    <button class="cat-btn active" onclick="setCategory('all',this)">🍀 Όλα <span class="cat-count" id="count-all">0</span></button>
+    <button class="cat-btn" onclick="setCategory('football',this)">⚽ Ποδόσφαιρο <span class="cat-count" id="count-football">0</span></button>
+    <button class="cat-btn" onclick="setCategory('basketball',this)">🏀 Μπάσκετ <span class="cat-count" id="count-basketball">0</span></button>
+    <button class="cat-btn" onclick="setCategory('volleyball',this)">🏐 Βόλεϊ <span class="cat-count" id="count-volleyball">0</span></button>
+    <button class="cat-btn" onclick="setCategory('tickets',this)">🎟️ Εισιτήρια <span class="cat-count" id="count-tickets">0</span></button>
+    <button class="cat-btn women-btn" onclick="setCategory('women',this)">👩 Γυναικείο <span class="cat-count" id="count-women">0</span></button>
   </div>
-
-  <!-- Status -->
-  <div class="status-bar" id="statusBar">Φόρτωση...</div>
-
-  <!-- Feed -->
+  <div class="status-bar" id="statusBar"><span class="blink" style="color:#4ade80">●</span> Φόρτωση...</div>
   <div class="feed" id="feed">
-    <div class="shimmer"></div>
-    <div class="shimmer"></div>
-    <div class="shimmer"></div>
-    <div class="shimmer"></div>
+    <div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>
   </div>
-
-  <!-- AdSense -->
   <div class="adsense">[ GOOGLE ADSENSE — ΔΙΑΦΗΜΙΣΗ ]</div>
-  <div class="footer">PAOALERT.GR · ΟΛΑ ΤΑ ΝΕΑ ΤΟΥ ΠΑΝΑΘΗΝΑΪΚΟΥ LIVE</div>
+  <div class="footer">PAOALERT · ΟΛΑ ΤΑ ΝΕΑ ΤΟΥ ΠΑΝΑΘΗΝΑΪΚΟΥ LIVE ΑΠΟ ΟΛΟ ΤΟΝ ΚΟΣΜΟ</div>
 </div>
 
-<!-- Modal -->
-<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal()">
-  <div class="modal" onclick="event.stopPropagation()">
+<div class="modal-overlay hidden" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
     <div class="modal-header">
-      <div id="modalTags"></div>
+      <div class="modal-header-left">
+        <div class="modal-tags" id="modalTags"></div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
-    <div class="modal-title" id="modalTitle"></div>
-    <div class="modal-time" id="modalTime"></div>
-    <img class="modal-img" id="modalImg" src="" alt="" onerror="this.style.display='none'" />
-    <div class="modal-content" id="modalContent"></div>
-    <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener noreferrer">Διάβασε ολόκληρο το άρθρο →</a>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <a class="btn-source" id="btnSource" href="#" target="_blank" rel="noopener noreferrer">🔗 Πήγαινε στην πηγή</a>
+      <a class="btn-read" id="btnRead" href="#" target="_blank" rel="noopener noreferrer">Διάβασε ολόκληρο →</a>
+    </div>
   </div>
 </div>
 
 <script>
-  const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
-  const FEEDS = [
-    { url: 'https://www.sport-fm.gr/rss/panathinaikos', source: 'sport-fm.gr', label: 'Sport FM', dotId: 'dot-sportfm' },
-    { url: 'https://www.sdna.gr/feed/panathinaikos', source: 'sdna.gr', label: 'SDNA', dotId: 'dot-sdna' },
-    { url: 'https://www.gazzetta.gr/rss/panathinaikos', source: 'gazzetta.gr', label: 'Gazzetta', dotId: 'dot-gazzetta' },
-    { url: 'https://www.sport24.gr/rss/panathinaikos', source: 'sport24.gr', label: 'Sport24', dotId: 'dot-sport24' },
-    { url: 'https://www.pao.gr/feed', source: 'pao.gr', label: 'PAO FC', dotId: 'dot-pao' },
-    { url: 'https://www.paobc.gr/feed', source: 'paobc.gr', label: 'PAO BC', dotId: 'dot-paobc' },
-    { url: 'https://feeds.feedburner.com/EuroleagueBasketball', source: 'euroleague.net', label: 'Euroleague', dotId: 'dot-euroleague' },
-  ];
+const PROXY='https://api.rss2json.com/v1/api.json?rss_url=';
 
-  let allNews = [];
-  let activeCategory = 'all';
+// ==========================================
+// CATEGORY DETECTION — ORDER MATTERS
+// Women is checked FIRST, overrides everything
+// ==========================================
 
-  function timeAgo(d) {
-    if (!d) return '—';
-    const diff = Math.floor((new Date() - new Date(d)) / 1000);
-    if (isNaN(diff)) return '—';
-    if (diff < 60) return 'μόλις τώρα';
-    if (diff < 3600) return Math.floor(diff/60) + ' λεπτά πριν';
-    if (diff < 86400) return Math.floor(diff/3600) + ' ώρες πριν';
-    return Math.floor(diff/86400) + ' μέρες πριν';
-  }
+// If ANY of these words appear → WOMEN category
+const WOMEN_W=['γυναικείο','γυναικεία','γυναίκες','γυναικών','women','woman','female','girls','ladies','κορίτσι','γυναίκα'];
 
-  function stripHtml(h) { return (h||'').replace(/<[^>]+>/g,'').trim(); }
+// Basketball words
+const BBALL_W=['euroleague','aktor','pao bc','paobc','μπάσκετ','μπάσκετμπολ','basketball','basket league','greek league basketball','nbg'];
 
-  function getCategory(t) {
-    t = (t||'').toLowerCase();
-    if (t.includes('bc')||t.includes('μπάσκετ')||t.includes('basket')||t.includes('euroleague')) return 'basketball';
-    if (t.includes('βόλεϊ')||t.includes('volley')) return 'volleyball';
-    if (t.includes('εισιτήρι')||t.includes('ticket')) return 'tickets';
-    return 'football';
-  }
+// Volleyball words  
+const VBALL_W=['βόλεϊ','βολεϊ','volleyball','volley'];
 
-  function getCatEmoji(c) {
-    return { football:'⚽', basketball:'🏀', volleyball:'🏐', tickets:'🎟️' }[c] || '🍀';
-  }
+// Ticket words
+const TICKET_W=['εισιτήρι','εισιτηρίων','ticket','tickets'];
 
-  function getTag(t) {
-    t = (t||'').toLowerCase();
-    if (t.includes('μεταγραφ')) return { tag:'ΜΕΤΑΓΡΑΦΗ', color:'#f59e0b' };
-    if (t.includes('τραυματ')) return { tag:'ΤΡΑΥΜΑΤΙΣΜΟΣ', color:'#ef4444' };
-    if (t.includes('εισιτήρι')||t.includes('ticket')) return { tag:'TICKET', color:'#22c55e' };
-    if (t.includes('νίκη')||t.includes('αποτέλε')||t.includes('win')) return { tag:'ΑΠΟΤΕΛΕΣΜΑ', color:'#22c55e' };
-    if (t.includes('επίσημ')) return { tag:'ΕΠΙΣΗΜΟ', color:'#8b5cf6' };
-    if (t.includes('breaking')) return { tag:'BREAKING', color:'#ef4444' };
-    return { tag:'ΕΙΔΗΣΗ', color:'#3b82f6' };
-  }
+// PAO keywords — article must mention PAO to be included
+const PAO_W=['παναθηναϊκ','panathinaikos','paobc','pao bc','τριφύλλι','trefoil','leoforos'];
 
-  async function fetchNews() {
-    const btn = document.getElementById('refreshBtn');
-    const icon = document.getElementById('refreshIcon');
-    btn.disabled = true;
-    icon.className = 'spin';
-    icon.textContent = '🔍';
+// FEEDS — each one targets specific content
+const FEEDS=[
+  // === WOMEN ===
+  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+γυναικείο&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'women'},
+  {url:'https://news.google.com/rss/search?q=Panathinaikos+women+football&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'women'},
+  {url:'https://news.google.com/rss/search?q=Panathinaikos+women+basketball&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'women'},
+  // === BASKETBALL ===
+  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+μπάσκετ&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'basketball'},
+  {url:'https://news.google.com/rss/search?q=Panathinaikos+euroleague&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'basketball'},
+  {url:'https://news.google.com/rss/search?q=Panathinaikos+basketball&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'basketball'},
+  {url:'https://www.paobc.gr/feed',label:'PAO BC Official',source:'paobc.gr',force:'basketball'},
+  {url:'https://feeds.feedburner.com/EuroleagueBasketball',label:'Euroleague',source:'euroleague.net',force:'basketball'},
+  // === VOLLEYBALL ===
+  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+βόλεϊ&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'volleyball'},
+  // === TICKETS ===
+  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+εισιτήρια&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'tickets'},
+  {url:'https://news.google.com/rss/search?q=Panathinaikos+tickets&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'tickets'},
+  // === FOOTBALL (general PAO news) ===
+  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+ποδόσφαιρο&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'football'},
+  {url:'https://news.google.com/rss/search?q=Panathinaikos+football&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'football'},
+  {url:'https://www.pao.gr/feed',label:'PAO FC Official',source:'pao.gr',force:'football'},
+  // === GENERAL (auto-detect) ===
+  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός&hl=el&gl=GR&ceid=GR:el',label:'Google News GR',source:'news.google.com',force:null},
+  {url:'https://news.google.com/rss/search?q=Panathinaikos&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:null},
+  {url:'https://www.sport-fm.gr/rss/all',label:'Sport FM',source:'sport-fm.gr',force:null},
+  {url:'https://www.sdna.gr/feed',label:'SDNA',source:'sdna.gr',force:null},
+  {url:'https://www.gazzetta.gr/rss/all',label:'Gazzetta',source:'gazzetta.gr',force:null},
+  {url:'https://www.sport24.gr/rss/all',label:'Sport24',source:'sport24.gr',force:null},
+];
 
-    document.getElementById('feed').innerHTML = '<div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>';
+let allNews=[],activeCategory='all',seenUrls=new Set(),isLoading=false;
 
-    const items = [];
-    await Promise.allSettled(FEEDS.map(async feed => {
-      try {
-        const res = await fetch(RSS2JSON + encodeURIComponent(feed.url));
-        const data = await res.json();
-        const dot = document.getElementById(feed.dotId);
-        if (data.items && data.items.length > 0) {
-          if (dot) { dot.classList.add('ok'); dot.classList.remove('error'); }
-          data.items.slice(0,10).forEach((item, i) => {
-            const text = (item.title||'') + ' ' + stripHtml(item.description||'');
-            const { tag, color } = getTag(text);
-            items.push({
-              id: feed.source + i,
-              category: getCategory(text),
-              tag, tagColor: color,
-              title: item.title || 'Χωρίς τίτλο',
-              summary: stripHtml(item.description||'').slice(0,150) + '...',
-              fullContent: stripHtml(item.content || item.description || ''),
-              source: feed.source,
-              sourceLabel: feed.label,
-              time: timeAgo(item.pubDate),
-              pubDate: item.pubDate,
-              link: item.link || '#',
-              image: item.enclosure?.link || item.thumbnail || null,
-              hot: i === 0,
-            });
-          });
-        } else {
-          if (dot) { dot.classList.add('error'); }
-        }
-      } catch {
-        const dot = document.getElementById(feed.dotId);
-        if (dot) { dot.classList.add('error'); }
-      }
-    }));
+function clean(h){return(h||'').replace(/<!\[CDATA\[|\]\]>/g,'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim()}
 
-    items.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
-    allNews = items;
+function contains(text,words){const t=(text||'').toLowerCase();return words.some(w=>t.includes(w))}
 
-    const now = new Date().toLocaleTimeString('el-GR', { hour:'2-digit', minute:'2-digit' });
-    document.getElementById('statusBar').textContent = `Τελευταία ενημέρωση: ${now} · ${items.length} άρθρα · Αυτόματη ανανέωση κάθε 15 λεπτά`;
+function isPAO(text){return contains(text,PAO_W)}
 
-    renderFeed();
-    btn.disabled = false;
-    icon.className = '';
-    icon.textContent = '🔍';
-  }
+// Smart category detection
+function detectCategory(text, forced){
+  // WOMEN always wins — if text mentions women it goes to women
+  if(contains(text,WOMEN_W))return'women';
+  // If forced category set (from feed), use it
+  if(forced)return forced;
+  // Auto detect from text
+  const t=(text||'').toLowerCase();
+  if(contains(text,TICKET_W))return'tickets';
+  if(contains(text,BBALL_W))return'basketball';
+  if(contains(text,VBALL_W))return'volleyball';
+  return'football';
+}
 
-  function renderFeed() {
-    const filtered = activeCategory === 'all' ? allNews : allNews.filter(n => n.category === activeCategory);
-    const feed = document.getElementById('feed');
-    if (filtered.length === 0) {
-      feed.innerHTML = '<div class="empty">Δεν βρέθηκαν νέα για αυτή την κατηγορία.</div>';
-      return;
+function getCatEmoji(c){return{football:'⚽',basketball:'🏀',volleyball:'🏐',tickets:'🎟️',women:'👩'}[c]||'🍀'}
+
+function getTag(text,cat){
+  if(cat==='women')return{tag:'ΓΥΝΑΙΚΕΙΟ',color:'#ec4899'};
+  const t=(text||'').toLowerCase();
+  if(t.includes('μεταγραφ')||t.includes('transfer')||t.includes('signing'))return{tag:'ΜΕΤΑΓΡΑΦΗ',color:'#f59e0b'};
+  if(t.includes('τραυματ')||t.includes('injur'))return{tag:'ΤΡΑΥΜΑΤΙΣΜΟΣ',color:'#ef4444'};
+  if(contains(text,TICKET_W))return{tag:'TICKET',color:'#22c55e'};
+  if(t.includes('νίκη')||t.includes('wins')||t.includes('victory')||t.includes('beats'))return{tag:'ΝΙΚΗ',color:'#22c55e'};
+  if(t.includes('ήττα')||t.includes('loses'))return{tag:'ΗΤΤΑ',color:'#ef4444'};
+  if(t.includes('επίσημ')||t.includes('official'))return{tag:'ΕΠΙΣΗΜΟ',color:'#8b5cf6'};
+  if(t.includes('breaking'))return{tag:'BREAKING',color:'#ef4444'};
+  if(t.includes('δηλώσεις')||t.includes('statement')||t.includes('said'))return{tag:'ΔΗΛΩΣΕΙΣ',color:'#a78bfa'};
+  if(t.includes('vs')||t.includes('αγώνας')||t.includes('ματς')||t.includes('match'))return{tag:'ΑΓΩΝΑΣ',color:'#3b82f6'};
+  return{tag:'ΕΙΔΗΣΗ',color:'#3b82f6'};
+}
+
+function timeAgo(d){
+  if(!d)return'—';
+  const diff=Math.floor((new Date()-new Date(d))/1000);
+  if(isNaN(diff)||diff<0)return'μόλις τώρα';
+  if(diff<60)return'μόλις τώρα';
+  if(diff<3600)return Math.floor(diff/60)+' λεπτά πριν';
+  if(diff<86400)return Math.floor(diff/3600)+' ώρες πριν';
+  return Math.floor(diff/86400)+' μέρες πριν';
+}
+
+async function fetchFeed(feed){
+  try{
+    const res=await fetch(PROXY+encodeURIComponent(feed.url),{signal:AbortSignal.timeout(9000)});
+    const data=await res.json();
+    if(!data.items||!data.items.length)return[];
+    const items=[];
+    for(const item of data.items.slice(0,20)){
+      const title=clean(item.title||'');
+      const desc=clean(item.description||item.content||'');
+      const full=title+' '+desc;
+      // Skip if not about PAO (unless official site)
+      const official=feed.source.includes('pao.gr')||feed.source.includes('paobc.gr');
+      if(!official&&!isPAO(full))continue;
+      // Skip duplicates
+      const link=item.link||'#';
+      if(seenUrls.has(link))continue;
+      seenUrls.add(link);
+      const cat=detectCategory(full,feed.force);
+      const{tag,color}=getTag(full,cat);
+      items.push({
+        id:link,category:cat,tag,tagColor:color,
+        title,
+        summary:desc.slice(0,200)+(desc.length>200?'...':''),
+        fullContent:desc,
+        source:feed.source,sourceLabel:feed.label,
+        time:timeAgo(item.pubDate),
+        pubDate:item.pubDate||new Date().toISOString(),
+        link,isNew:true
+      });
     }
-    feed.innerHTML = filtered.map((item, i) => `
-      <div class="card ${item.hot ? 'hot' : ''}" onclick="openModal(${allNews.indexOf(item)})" style="animation-delay:${i*0.03}s">
-        <div class="card-emoji">${getCatEmoji(item.category)}</div>
-        <div class="card-body">
-          <div class="card-tags">
-            <span class="tag" style="color:${item.tagColor};background:${item.tagColor}20;border:1px solid ${item.tagColor}40">${item.tag}</span>
-            ${item.hot ? '<span class="hot-badge">🔥 HOT</span>' : ''}
-          </div>
-          <div class="card-title">${item.title}</div>
-          <div class="card-summary">${item.summary}</div>
-          <div class="card-meta">
-            <span>📎 ${item.sourceLabel}</span>
-            <span>🕐 ${item.time}</span>
-            <span class="read">▶ Διάβασε</span>
-          </div>
+    return items;
+  }catch{return[]}
+}
+
+async function fetchAllNews(){
+  if(isLoading)return;
+  isLoading=true;
+  const btn=document.getElementById('refreshBtn');
+  const icon=document.getElementById('refreshIcon');
+  const text=document.getElementById('refreshText');
+  btn.disabled=true;icon.className='spin';text.textContent='Σκανάρει...';
+  if(allNews.length===0)document.getElementById('feed').innerHTML='<div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>';
+  const prevCount=allNews.length;
+  seenUrls=new Set(allNews.map(n=>n.id));
+  const results=await Promise.allSettled(FEEDS.map(fetchFeed));
+  const newItems=[];
+  results.forEach(r=>{if(r.status==='fulfilled')newItems.push(...r.value)});
+  // Merge, deduplicate by link, sort newest first
+  const allMap=new Map();
+  [...newItems,...allNews].forEach(n=>allMap.set(n.id,n));
+  allNews=Array.from(allMap.values()).sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate)).slice(0,300);
+  // Counts
+  const counts={all:allNews.length,football:0,basketball:0,volleyball:0,tickets:0,women:0};
+  allNews.forEach(n=>{if(counts[n.category]!==undefined)counts[n.category]++});
+  Object.keys(counts).forEach(k=>{const el=document.getElementById('count-'+k);if(el)el.textContent=counts[k]});
+  document.getElementById('newsCount').textContent=allNews.length+' νέα';
+  const added=allNews.length-prevCount;
+  if(added>0&&prevCount>0){
+    const al=document.getElementById('newAlert');
+    al.textContent='🔥 +'+added+' νέα!';
+    al.style.display='block';
+    setTimeout(()=>al.style.display='none',6000);
+  }
+  const now=new Date().toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('statusBar').innerHTML=`<span style="color:#4ade80" class="blink">●</span> Ενημέρωση: ${now} · ${allNews.length} άρθρα${added>0&&prevCount>0?` · <span style="color:#4ade80;font-weight:700">+${added} νέα!</span>`:''} · Επόμενη σε 5 λεπτά`;
+  // Timer bar
+  const tp=document.getElementById('timerProgress');
+  tp.style.transition='none';tp.style.width='100%';
+  setTimeout(()=>{tp.style.transition='width 300s linear';tp.style.width='0%'},100);
+  renderFeed();
+  isLoading=false;btn.disabled=false;icon.className='';icon.textContent='🔍';text.textContent='Ανανέωση';
+}
+
+function renderFeed(){
+  const filtered=activeCategory==='all'?allNews:allNews.filter(n=>n.category===activeCategory);
+  const feed=document.getElementById('feed');
+  if(filtered.length===0){feed.innerHTML='<div class="empty">Δεν βρέθηκαν νέα.<br>Δοκίμασε ανανέωση!</div>';return}
+  feed.innerHTML=filtered.map((item,i)=>`
+    <div class="card ${i<3?'hot':''} ${item.isNew?'isnew':''} ${item.category==='women'?'women-card':''}" style="animation-delay:${Math.min(i*0.03,0.6)}s">
+      <div class="card-emoji">${getCatEmoji(item.category)}</div>
+      <div class="card-body">
+        <div class="card-tags">
+          <span class="tag" style="color:${item.tagColor};background:${item.tagColor}18;border:1px solid ${item.tagColor}35">${item.tag}</span>
+          ${i<3?'<span class="hot-badge">🔥 HOT</span>':''}
+          ${item.isNew?'<span class="new-badge">● NEW</span>':''}
+        </div>
+        <div class="card-title">${item.title}</div>
+        <div class="card-summary">${item.summary}</div>
+        <div class="card-meta">
+          <span>📎 ${item.sourceLabel}</span>
+          <span>🕐 ${item.time}</span>
+          <button class="read-btn" onclick="openModal('${encodeURIComponent(item.id)}')">▶ Διάβασε εδώ</button>
+          <a class="orig-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">🔗 Πηγή</a>
         </div>
       </div>
-    `).join('');
-  }
+    </div>
+  `).join('');
+}
 
-  function setCategory(cat, el) {
-    activeCategory = cat;
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    renderFeed();
-  }
+function setCategory(cat,el){
+  activeCategory=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderFeed();
+}
 
-  function openModal(idx) {
-    const item = allNews[idx];
-    if (!item) return;
-    document.getElementById('modalTags').innerHTML = `<span class="tag" style="color:${item.tagColor};background:${item.tagColor}20;border:1px solid ${item.tagColor}40">${item.tag}</span>`;
-    document.getElementById('modalTitle').textContent = item.title;
-    document.getElementById('modalTime').textContent = `🕐 ${item.time} · 📎 ${item.sourceLabel}`;
-    const img = document.getElementById('modalImg');
-    if (item.image) { img.src = item.image; img.style.display = 'block'; } else { img.style.display = 'none'; }
-    document.getElementById('modalContent').textContent = item.fullContent || item.summary;
-    document.getElementById('modalLink').href = item.link;
-    document.getElementById('modalLink').textContent = `Διάβασε ολόκληρο το άρθρο → ${item.source}`;
-    document.getElementById('modalOverlay').classList.remove('hidden');
-  }
+function openModal(encodedId){
+  const id=decodeURIComponent(encodedId);
+  const item=allNews.find(n=>n.id===id);
+  if(!item)return;
+  document.getElementById('modalTags').innerHTML=`<span class="tag" style="color:${item.tagColor};background:${item.tagColor}18;border:1px solid ${item.tagColor}35">${item.tag}</span><span style="font-size:11px;color:#6b7280;font-family:'Barlow Condensed'">${getCatEmoji(item.category)} ${item.sourceLabel}</span>`;
+  document.getElementById('modalTitle').textContent=item.title;
+  document.getElementById('modalMeta').innerHTML=`<span>🕐 ${item.time}</span><span>📎 ${item.source}</span>`;
+  document.getElementById('modalBody').textContent=item.fullContent||item.summary||'Κλικ παρακάτω για να διαβάσεις ολόκληρο το άρθρο.';
+  document.getElementById('btnSource').href=item.link;
+  document.getElementById('btnRead').href=item.link;
+  document.getElementById('btnRead').textContent='Διάβασε ολόκληρο → '+item.source;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
 
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.add('hidden');
-  }
+function closeModal(){
+  document.getElementById('modalOverlay').classList.add('hidden');
+  document.body.style.overflow='';
+}
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  // Fetch on load
-  fetchNews();
-
-  // Auto refresh every 15 minutes
-  setInterval(fetchNews, 15 * 60 * 1000);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+fetchAllNews();
+setInterval(fetchAllNews,5*60*1000);
 </script>
 </body>
 </html>
