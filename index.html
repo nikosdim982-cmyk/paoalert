@@ -137,7 +137,7 @@
     <div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>
   </div>
   <div class="adsense">[ GOOGLE ADSENSE — ΔΙΑΦΗΜΙΣΗ ]</div>
-  <div class="footer">PAOALERT · ΟΛΑ ΤΑ ΝΕΑ ΤΟΥ ΠΑΝΑΘΗΝΑΪΚΟΥ LIVE ΑΠΟ ΟΛΟ ΤΟΝ ΚΟΣΜΟ</div>
+  <div class="footer">PAOALERT · ΟΛΑ ΤΑ ΝΕΑ ΤΟΥ ΠΑΝΑΘΗΝΑΪΚΟΥ LIVE</div>
 </div>
 
 <div class="modal-overlay hidden" id="modalOverlay" onclick="if(event.target===this)closeModal()">
@@ -167,19 +167,8 @@ const VBALL_W=['βόλεϊ','βολεϊ','volleyball','volley'];
 const TICKET_W=['εισιτήρι','εισιτηρίων','ticket','tickets'];
 const PAO_W=['παναθηναϊκ','panathinaikos','paobc','pao bc','τριφύλλι','trefoil'];
 
+// Only Greek sports sites that allow RSS - no Google News
 const FEEDS=[
-  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+γυναικείο&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'women'},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos+women&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'women'},
-  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+μπάσκετ&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'basketball'},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos+euroleague&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'basketball'},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos+basketball&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'basketball'},
-  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+βόλεϊ&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'volleyball'},
-  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+εισιτήρια&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'tickets'},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos+tickets&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'tickets'},
-  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+ποδόσφαιρο&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'football'},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos+football&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'football'},
-  {url:'https://news.google.com/rss/search?q=Παναθηναϊκός&hl=el&gl=GR&ceid=GR:el',label:'Google News GR',source:'news.google.com',force:null},
-  {url:'https://news.google.com/rss/search?q=Panathinaikos&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:null},
   {url:'https://www.sport-fm.gr/rss/all',label:'Sport FM',source:'sport-fm.gr',force:null},
   {url:'https://www.sdna.gr/feed',label:'SDNA',source:'sdna.gr',force:null},
   {url:'https://www.gazzetta.gr/rss/all',label:'Gazzetta',source:'gazzetta.gr',force:null},
@@ -187,6 +176,7 @@ const FEEDS=[
   {url:'https://www.pao.gr/feed',label:'PAO FC Official',source:'pao.gr',force:'football'},
   {url:'https://www.paobc.gr/feed',label:'PAO BC Official',source:'paobc.gr',force:'basketball'},
   {url:'https://feeds.feedburner.com/EuroleagueBasketball',label:'Euroleague',source:'euroleague.net',force:'basketball'},
+  {url:'https://www.novasports.gr/rss',label:'Novasports',source:'novasports.gr',force:null},
 ];
 
 let allNews=[],activeCategory='all',seenUrls=new Set(),isLoading=false;
@@ -198,7 +188,6 @@ function isPAO(t){return has(t,PAO_W)}
 function detectCat(text,forced){
   if(has(text,WOMEN_W))return'women';
   if(forced)return forced;
-  const t=(text||'').toLowerCase();
   if(has(text,TICKET_W))return'tickets';
   if(has(text,BBALL_W))return'basketball';
   if(has(text,VBALL_W))return'volleyball';
@@ -217,7 +206,7 @@ function getTag(text,cat){
   if(t.includes('ήττα')||t.includes('loses'))return{tag:'ΗΤΤΑ',color:'#ef4444'};
   if(t.includes('επίσημ')||t.includes('official'))return{tag:'ΕΠΙΣΗΜΟ',color:'#8b5cf6'};
   if(t.includes('breaking'))return{tag:'BREAKING',color:'#ef4444'};
-  if(t.includes('δηλώσεις')||t.includes('statement')||t.includes('said'))return{tag:'ΔΗΛΩΣΕΙΣ',color:'#a78bfa'};
+  if(t.includes('δηλώσεις')||t.includes('statement'))return{tag:'ΔΗΛΩΣΕΙΣ',color:'#a78bfa'};
   return{tag:'ΕΙΔΗΣΗ',color:'#3b82f6'};
 }
 
