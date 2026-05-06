@@ -135,6 +135,36 @@
   <div class="feed" id="feed">
     <div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>
   </div>
+  <!-- Panathinaikos Nation Discord Card -->
+  <div style="margin-top:28px;display:flex;justify-content:center;">
+    <div style="width:100%;max-width:320px;background:linear-gradient(160deg,#0f0f1a,#1a1030);border:1px solid rgba(88,101,242,0.4);border-radius:20px;overflow:hidden;box-shadow:0 10px 40px rgba(88,101,242,0.15);">
+      <div style="background:linear-gradient(135deg,#5865f2,#7289da);padding:20px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:6px;">🍀</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;color:#fff;">Panathinaikos Nation</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:2px;">Η μεγαλύτερη PAO κοινότητα</div>
+      </div>
+      <div style="padding:18px;">
+        <div style="display:flex;gap:12px;margin-bottom:16px;">
+          <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#fff;">4.079</div>
+            <div style="font-size:11px;color:#6b7280;margin-top:2px;">Μέλη</div>
+          </div>
+          <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#fff;">21</div>
+            <div style="font-size:11px;color:#6b7280;margin-top:2px;">Boosts</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4ade80;margin-bottom:16px;justify-content:center;">
+          <div style="width:8px;height:8px;border-radius:50%;background:#4ade80;animation:blink 1.5s infinite;"></div>
+          Online τώρα
+        </div>
+        <a href="https://discord.gg/paonation" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;background:linear-gradient(135deg,#5865f2,#7289da);color:#fff;border:none;padding:13px;border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;cursor:pointer;text-decoration:none;text-align:center;letter-spacing:0.5px;">
+          💬 Μπες στο Server
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div class="adsense">[ GOOGLE ADSENSE — ΔΙΑΦΗΜΙΣΗ ]</div>
   <div class="footer">PAOALERT · ΟΛΑ ΤΑ ΝΕΑ ΤΟΥ ΠΑΝΑΘΗΝΑΪΚΟΥ LIVE ΑΠΟ ΟΛΟ ΤΟΝ ΚΟΣΜΟ</div>
 </div>
@@ -159,7 +189,7 @@
 
 <script>
 // Cloudflare Worker proxy — no cache, real-time
-const PROXY='https://paoalert-proxy.nikosdim982.workers.dev/?url=';
+const PROXY='https://api.rss2json.com/v1/api.json?rss_url=';
 
 const WOMEN_W=['γυναικείο','γυναικεία','γυναίκες','γυναικών','women','woman','female','girls','ladies'];
 const BBALL_W=['euroleague','aktor','pao bc','paobc','μπάσκετ','basketball','basket league'];
