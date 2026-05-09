@@ -6,82 +6,139 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PaoAlert - Live News Παναθηναϊκός</title>
   <script defer src="/_vercel/insights/script.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@700;800;900&display=swap');
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#080f08;color:#e5e7eb;font-family:'Barlow',sans-serif;min-height:100vh}
-    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#1a3a1a;border-radius:4px}
-    .ticker-wrap{overflow:hidden;background:#15803d;padding:7px 0}
-    .ticker{display:inline-flex;gap:50px;animation:ticker 40s linear infinite;white-space:nowrap;font-family:'Barlow Condensed';font-size:12px;color:#fff;letter-spacing:1px;padding-left:100%}
+    :root{
+      --green:#1a7a3c;
+      --green-light:#2ea84f;
+      --green-bright:#4ade80;
+      --green-pale:#e8f5ee;
+      --green-mid:#d4eddf;
+      --dark:#0f1f14;
+      --text:#1a2e1f;
+      --text-light:#5a7a65;
+      --border:#c8dfd0;
+      --bg:#f4f9f6;
+      --card-bg:#ffffff;
+    }
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--green-bright);border-radius:4px}
+
+    /* TICKER */
+    .ticker-wrap{overflow:hidden;background:var(--green);padding:7px 0}
+    .ticker{display:inline-flex;gap:60px;animation:ticker 40s linear infinite;white-space:nowrap;font-family:'Syne';font-size:11px;font-weight:700;color:#fff;letter-spacing:2px;padding-left:100%}
     @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-    .header{background:linear-gradient(180deg,#0d2a0d,#080f08);border-bottom:2px solid #15803d;padding:16px 20px;position:sticky;top:0;z-index:100}
-    .header-inner{max-width:980px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-    .logo-wrap{display:flex;align-items:center;gap:12px}
-    .logo-icon{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#15803d,#4ade80);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
-    .logo-name{font-family:'Barlow Condensed';font-weight:900;font-size:30px;color:#fff;line-height:1}
-    .logo-name span{color:#4ade80}
-    .logo-sub{font-size:11px;color:#4ade80;font-family:'Barlow Condensed';letter-spacing:2px;margin-top:2px}
+
+    /* HEADER */
+    .header{background:var(--dark);padding:0 28px;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--green-bright)}
+    .header-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:12px;flex-wrap:wrap}
+    .logo-wrap{display:flex;align-items:center;gap:14px}
+    .logo-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--green),var(--green-bright));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 0 20px rgba(74,222,128,0.3)}
+    .logo-name{font-family:'Syne';font-weight:800;font-size:32px;color:#fff;line-height:1;letter-spacing:-1px}
+    .logo-name span{color:var(--green-bright)}
+    .logo-sub{font-size:10px;color:#4b6e58;letter-spacing:3px;margin-top:3px;font-family:'Syne'}
     .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .news-count{background:#15803d;color:#fff;font-size:12px;padding:5px 12px;border-radius:20px;font-family:'Barlow Condensed';font-weight:700}
-    .new-alert{background:#ef4444;color:#fff;font-size:12px;padding:5px 12px;border-radius:20px;font-family:'Barlow Condensed';font-weight:700;animation:pulse 1s infinite;display:none}
+    .news-count{background:var(--green-bright);color:var(--dark);font-family:'Syne';font-size:13px;font-weight:700;padding:7px 16px;border-radius:8px}
+    .new-alert{background:#ef4444;color:#fff;font-family:'Syne';font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;animation:pulse 1s infinite;display:none}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-    .refresh-btn{background:#15803d;color:#fff;border:none;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:700;font-family:'Barlow Condensed';cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s}
-    .refresh-btn:hover{background:#16a34a}
-    .refresh-btn:disabled{opacity:0.6;cursor:not-allowed}
-    .timer-bar{height:3px;background:#1a3a1a}
-    .timer-progress{height:100%;background:#4ade80;width:100%;transition:none}
-    .main{max-width:980px;margin:0 auto;padding:16px}
-    .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-    .cat-btn{border:1px solid #1a3a1a;color:#9ca3af;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:600;font-family:'Barlow';background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px}
-    .cat-btn.active{background:#15803d;color:#fff;border-color:#15803d}
+    .refresh-btn{background:transparent;color:var(--green-bright);border:2px solid var(--green-bright);padding:7px 16px;border-radius:8px;font-family:'Syne';font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s}
+    .refresh-btn:hover{background:var(--green-bright);color:var(--dark)}
+    .refresh-btn:disabled{opacity:0.5;cursor:not-allowed}
+    .discord-btn{background:#5865f2;color:#fff;border:none;padding:7px 16px;border-radius:8px;font-family:'Syne';font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s}
+    .discord-btn:hover{background:#4752c4;transform:scale(1.03)}
+    .timer-bar{height:3px;background:rgba(255,255,255,0.1)}
+    .timer-progress{height:100%;background:var(--green-bright);width:100%;transition:none}
+    .discord-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,31,20,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)}
+    .discord-overlay.hidden{display:none}
+    .discord-modal{background:#fff;border-radius:20px;max-width:480px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+    .discord-header{background:linear-gradient(135deg,#5865f2,#7289da);padding:32px;text-align:center}
+    .discord-icon{font-size:48px;margin-bottom:12px}
+    .discord-title{font-family:'Syne';font-weight:800;font-size:22px;color:#fff;margin-bottom:6px}
+    .discord-subtitle{font-size:13px;color:rgba(255,255,255,0.8)}
+    .discord-body{padding:24px}
+    .discord-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+    .discord-list li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#333;font-family:'DM Sans';line-height:1.4}
+    .discord-join{display:block;width:100%;background:#5865f2;color:#fff;text-align:center;padding:14px;border-radius:12px;text-decoration:none;font-family:'Syne';font-weight:700;font-size:16px;transition:all 0.2s;margin-bottom:10px}
+    .discord-join:hover{background:#4752c4}
+    .discord-close-btn{display:block;width:100%;background:transparent;color:#999;text-align:center;padding:10px;border-radius:12px;font-family:'Syne';font-size:13px;cursor:pointer;border:none}
+    .discord-close-btn:hover{color:#333}
+
+    /* MAIN */
+    .main{max-width:1000px;margin:0 auto;padding:24px 28px}
+
+    /* CATS */
+    .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:20px;border-bottom:2px solid var(--border)}
+    .cat-btn{border:2px solid var(--border);color:var(--text-light);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;font-family:'Syne';background:var(--card-bg);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px}
+    .cat-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
     .cat-btn.active.women-btn{background:#be185d;border-color:#be185d}
-    .cat-btn:hover{opacity:0.85}
-    .cat-count{background:rgba(255,255,255,0.2);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700}
-    .status-bar{font-size:12px;color:#4b5563;margin-bottom:14px;font-family:'Barlow Condensed';display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .feed{display:flex;flex-direction:column;gap:8px}
-    .card{background:#0d1a0d;border:1px solid #131f13;border-radius:14px;padding:14px 16px;transition:all 0.2s;display:flex;gap:12px;align-items:flex-start;animation:fadeIn 0.35s ease forwards;opacity:0}
-    .card.hot{background:rgba(34,197,94,0.05);border-color:#1a5c1a}
-    .card.isnew{border-color:#22c55e}
-    .card.women-card{border-color:#831843;background:rgba(190,24,93,0.04)}
-    .card:hover{background:rgba(34,197,94,0.08);transform:translateX(3px)}
-    .card-emoji{font-size:22px;margin-top:2px;flex-shrink:0}
+    .cat-btn:hover{border-color:var(--green);color:var(--green)}
+    .cat-count{background:rgba(0,0,0,0.08);border-radius:8px;padding:1px 7px;font-size:11px}
+    .cat-btn.active .cat-count{background:rgba(255,255,255,0.2)}
+
+    /* STATUS */
+    .status-bar{font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'Syne';display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+    /* FEED */
+    .feed{display:flex;flex-direction:column;gap:0}
+    .card{border-bottom:1px solid var(--border);padding:20px 0;transition:all 0.2s;display:flex;gap:18px;align-items:flex-start;animation:fadeIn 0.35s ease forwards;opacity:0;cursor:pointer}
+    .card:hover{padding-left:8px;background:var(--green-pale);border-radius:10px;padding-right:8px;border-bottom-color:transparent;margin-bottom:1px}
+    .card-num{font-family:'Syne';font-size:44px;font-weight:800;color:var(--green-mid);line-height:1;flex-shrink:0;width:50px;transition:color 0.2s}
+    .card:hover .card-num,.card.hot .card-num{color:var(--green-bright)}
     .card-body{flex:1;min-width:0}
-    .card-tags{display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap}
-    .tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;font-family:'Barlow Condensed';letter-spacing:1px}
-    .hot-badge{font-size:10px;color:#f59e0b;font-family:'Barlow Condensed';font-weight:700}
-    .new-badge{font-size:10px;color:#4ade80;font-family:'Barlow Condensed';font-weight:700;animation:blink 1s infinite}
-    .card-title{font-size:15px;font-weight:700;color:#f3f4f6;margin-bottom:4px;line-height:1.35;font-family:'Barlow Condensed'}
-    .card-summary{font-size:13px;color:#6b7280;line-height:1.55;margin-bottom:7px}
-    .card-meta{display:flex;gap:10px;font-size:11px;color:#4b5563;font-family:'Barlow Condensed';flex-wrap:wrap}
-    .read-btn{color:#4ade80!important;cursor:pointer;background:none;border:none;font-family:'Barlow Condensed';font-size:11px;font-weight:700;padding:0}
-    .orig-btn{color:#6b7280!important;cursor:pointer;background:none;border:none;font-family:'Barlow Condensed';font-size:11px;padding:0;text-decoration:none}
-    .orig-btn:hover{color:#9ca3af!important}
-    .shimmer{background:linear-gradient(90deg,#0d1a0d 25%,#1a3a1a 50%,#0d1a0d 75%);background-size:800px 100%;animation:shimmer 1.5s infinite;border-radius:14px;height:85px;margin-bottom:8px}
-    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+    .card-tags{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+    .tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:5px;font-family:'Syne';letter-spacing:1px}
+    .hot-badge{font-size:10px;color:#f59e0b;font-family:'Syne';font-weight:700}
+    .new-badge{font-size:10px;color:#fff;background:var(--green);font-family:'Syne';font-weight:700;padding:2px 8px;border-radius:5px;animation:blink 1.5s infinite}
+    .card-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.35;font-family:'Syne'}
+    .card-summary{font-size:13px;color:var(--text-light);line-height:1.6;margin-bottom:8px}
+    .card-meta{display:flex;gap:12px;font-size:12px;color:#8aaa96;font-family:'DM Sans';flex-wrap:wrap;align-items:center}
+    .card-img{width:110px;height:75px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--green-mid);border:2px solid var(--border)}
+    .card-img-placeholder{width:110px;height:75px;border-radius:10px;flex-shrink:0;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:30px;border:2px solid var(--border)}
+
+    /* SHIMMER */
+    .shimmer{background:linear-gradient(90deg,var(--green-pale) 25%,var(--green-mid) 50%,var(--green-pale) 75%);background-size:800px 100%;animation:shimmer 1.5s infinite;border-radius:10px;height:80px;margin-bottom:12px}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,31,20,0.8);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)}
     .modal-overlay.hidden{display:none}
-    .modal{background:#0a140a;border:1px solid #1a3a1a;border-radius:20px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
-    .modal-header{padding:20px 24px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:#0a140a;border-bottom:1px solid #1a3a1a}
-    .modal-header-left{flex:1}
-    .modal-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-    .modal-title{font-family:'Barlow Condensed';font-weight:900;font-size:22px;color:#fff;line-height:1.3}
-    .modal-meta{font-size:12px;color:#4b5563;font-family:'Barlow Condensed';display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
-    .close-btn{cursor:pointer;background:#1a3a1a;border:none;color:#fff;width:36px;height:36px;border-radius:10px;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
-    .close-btn:hover{background:#15803d}
-    .modal-body{padding:20px 24px;font-size:14px;color:#9ca3af;line-height:1.8;flex:1}
-    .modal-footer{padding:16px 24px;border-top:1px solid #1a3a1a;display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#0a140a}
-    .btn-read{flex:1;background:#15803d;color:#fff;text-align:center;padding:13px;border-radius:12px;text-decoration:none;font-family:'Barlow Condensed';font-weight:700;font-size:15px;transition:background 0.2s;border:none;cursor:pointer;display:block}
-    .btn-read:hover{background:#16a34a}
-    .btn-source{flex:1;background:transparent;color:#4ade80;text-align:center;padding:13px;border-radius:12px;text-decoration:none;font-family:'Barlow Condensed';font-weight:700;font-size:15px;border:1px solid #1a5c1a;transition:all 0.2s;display:block}
-    .btn-source:hover{background:rgba(74,222,128,0.08)}
-    .empty{text-align:center;padding:50px 20px;color:#4b5563;font-family:'Barlow Condensed';font-size:16px;line-height:2}
-    .adsense{margin-top:28px;background:#0d1a0d;border:1px dashed #1a3a1a;border-radius:12px;padding:22px;text-align:center;color:#374151;font-size:12px;font-family:'Barlow Condensed';letter-spacing:1px}
-    .footer{text-align:center;margin-top:16px;padding-bottom:24px;font-size:11px;color:#1f2937;font-family:'Barlow Condensed';letter-spacing:1px}
+    .modal{background:#fff;border:2px solid var(--border);border-radius:18px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(15,31,20,0.3)}
+    .modal-img-wrap{position:relative}
+    .modal-img{width:100%;height:240px;object-fit:cover;border-radius:16px 16px 0 0}
+    .modal-img-placeholder{width:100%;height:160px;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:60px;border-radius:16px 16px 0 0}
+    .close-btn{position:absolute;top:12px;right:12px;cursor:pointer;background:rgba(255,255,255,0.9);border:none;color:var(--dark);width:36px;height:36px;border-radius:10px;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;backdrop-filter:blur(4px)}
+    .close-btn:hover{background:var(--green);color:#fff}
+    .modal-content{padding:24px}
+    .modal-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .modal-title{font-family:'Syne';font-weight:800;font-size:21px;color:var(--text);line-height:1.3;margin-bottom:12px}
+    .modal-meta{font-size:12px;color:var(--text-light);font-family:'DM Sans';display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .modal-body{font-size:14px;color:#555;line-height:1.8;margin-bottom:20px}
+    .modal-footer{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-read{flex:1;background:var(--green);color:#fff;text-align:center;padding:13px;border-radius:10px;text-decoration:none;font-family:'Syne';font-weight:700;font-size:14px;transition:all 0.2s;border:none;cursor:pointer;display:block}
+    .btn-read:hover{background:var(--green-light)}
+    .btn-source{flex:1;background:transparent;color:var(--green);text-align:center;padding:13px;border-radius:10px;text-decoration:none;font-family:'Syne';font-weight:700;font-size:14px;border:2px solid var(--green);transition:all 0.2s;display:block}
+    .btn-source:hover{background:var(--green-pale)}
+
+    /* MISC */
+    .empty{text-align:center;padding:60px 20px;color:var(--text-light);font-family:'Syne';font-size:16px;line-height:2}
+    .adsense{margin-top:32px;background:var(--green-pale);border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;color:var(--text-light);font-size:12px;font-family:'Syne';letter-spacing:1px}
+    .footer{text-align:center;margin-top:20px;padding-bottom:28px;font-size:11px;color:var(--border);font-family:'Syne';letter-spacing:2px}
+
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
     .blink{animation:blink 1.2s infinite}
-    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
     .spin{display:inline-block;animation:spin 1s linear infinite}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+    @media(max-width:600px){
+      .main{padding:16px}
+      .header{padding:0 16px}
+      .card-img,.card-img-placeholder{width:80px;height:60px}
+      .card-num{font-size:34px;width:40px}
+      .card-title{font-size:14px}
+      .modal-img{height:180px}
+    }
   </style>
 </head>
 <body>
@@ -95,10 +152,7 @@
     <span>👩 ΓΥΝΑΙΚΕΙΟ ΤΜΗΜΑ</span>
     <span>🎟️ ΕΙΣΙΤΗΡΙΑ · TICKET DROPS</span>
     <span>🌍 ΠΑΓΚΟΣΜΙΑ ΚΑΛΥΨΗ · 5 ΛΕΠΤΑ ΑΝΑΝΕΩΣΗ</span>
-    <span>🍀 PAOALERT — LIVE NEWS ΠΑΝΑΘΗΝΑΪΚΟΣ</span>
-    <span>⚽ ΠΑΟ FC</span>
-    <span>🏀 ΠΑΟ BC · EUROLEAGUE</span>
-    <span>👩 ΓΥΝΑΙΚΕΙΟ</span>
+    <span>🍀 PAOALERT</span>
   </div>
 </div>
 
@@ -118,6 +172,9 @@
         <span id="refreshIcon">🔍</span>
         <span id="refreshText">Ανανέωση</span>
       </button>
+      <button class="discord-btn" onclick="document.getElementById('discordModal').classList.remove('hidden')">
+        💬 Discord
+      </button>
     </div>
   </div>
   <div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div>
@@ -132,9 +189,9 @@
     <button class="cat-btn" onclick="setCategory('tickets',this)">🎟️ Εισιτήρια <span class="cat-count" id="count-tickets">0</span></button>
     <button class="cat-btn women-btn" onclick="setCategory('women',this)">👩 Γυναικείο <span class="cat-count" id="count-women">0</span></button>
   </div>
-  <div class="status-bar" id="statusBar"><span class="blink" style="color:#4ade80">●</span> Φόρτωση...</div>
+  <div class="status-bar" id="statusBar"><span class="blink" style="color:var(--green)">●</span> Φόρτωση...</div>
   <div class="feed" id="feed">
-    <div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>
+    <div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>
   </div>
   <div class="adsense">[ GOOGLE ADSENSE — ΔΙΑΦΗΜΙΣΗ ]</div>
   <div class="footer">PAOALERT · ΟΛΑ ΤΑ ΝΕΑ ΤΟΥ ΠΑΝΑΘΗΝΑΪΚΟΥ LIVE</div>
@@ -142,25 +199,47 @@
 
 <div class="modal-overlay hidden" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-header-left">
-        <div class="modal-tags" id="modalTags"></div>
-        <div class="modal-title" id="modalTitle"></div>
-        <div class="modal-meta" id="modalMeta"></div>
-      </div>
+    <div class="modal-img-wrap">
+      <div id="modalImg"></div>
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-footer">
-      <a class="btn-source" id="btnSource" href="#" target="_blank" rel="noopener noreferrer">🔗 Πήγαινε στην πηγή</a>
-      <a class="btn-read" id="btnRead" href="#" target="_blank" rel="noopener noreferrer">Διάβασε ολόκληρο →</a>
+    <div class="modal-content">
+      <div class="modal-tags" id="modalTags"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <a class="btn-source" id="btnSource" href="#" target="_blank" rel="noopener noreferrer">🔗 Πηγή</a>
+        <a class="btn-read" id="btnRead" href="#" target="_blank" rel="noopener noreferrer">Διάβασε ολόκληρο →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Discord Modal -->
+<div class="discord-overlay hidden" id="discordModal" onclick="if(event.target===this)document.getElementById('discordModal').classList.add('hidden')">
+  <div class="discord-modal">
+    <div class="discord-header">
+      <div class="discord-icon">🍀</div>
+      <div class="discord-title">Panathinaikos Nation</div>
+      <div class="discord-subtitle">Η μεγαλύτερη παναθηναϊκή κοινότητα · 4.000+ μέλη</div>
+    </div>
+    <div class="discord-body">
+      <ul class="discord-list">
+        <li>Γίνετε μέρος της μεγαλύτερης παναθηναϊκής κοινότητας του Discord</li>
+        <li>Συζητάτε με άλλους Παναθηναϊκούς για όλα τα θέματα</li>
+        <li>Βλέπετε δωρεάν όλους τους αγώνες του Παναθηναϊκού</li>
+        <li>Μαθαίνετε πρώτοι αποκλειστικά νέα για τον Παναθηναϊκό</li>
+      </ul>
+      <a class="discord-join" href="https://discord.gg/paonation" target="_blank" rel="noopener noreferrer">💬 Γίνετε τώρα μέλος!</a>
+      <button class="discord-close-btn" onclick="document.getElementById('discordModal').classList.add('hidden')">Όχι ευχαριστώ</button>
     </div>
   </div>
 </div>
 
 <script>
 const WORKER_PROXY='https://paoalert-proxy.nikosdim982.workers.dev/?url=';
-const RSS2JSON_PROXY='https://api.rss2json.com/v1/api.json?rss_url=';
+const RSS2JSON_PROXY='https://api.rss2json.com/v1/api.json?api_key=sjdf0rsqb24uoatqotzp45dskhiiu6tskyhgcqqf&rss_url=';
 
 const WOMEN_W=['γυναικείο','γυναικεία','γυναίκες','γυναικών','women','woman','female','girls','ladies'];
 const BBALL_W=['euroleague','aktor','pao bc','paobc','μπάσκετ','basketball','basket league'];
@@ -168,7 +247,6 @@ const VBALL_W=['βόλεϊ','βολεϊ','volleyball','volley'];
 const TICKET_W=['εισιτήρι','εισιτηρίων','ticket','tickets'];
 const PAO_W=['παναθηναϊκ','panathinaikos','paobc','pao bc','τριφύλλι','trefoil'];
 
-// Google News uses rss2json, Greek sites use Cloudflare Worker
 const FEEDS=[
   {url:'https://news.google.com/rss/search?q=Παναθηναϊκός+γυναικείο&hl=el&gl=GR&ceid=GR:el',label:'Google News',source:'news.google.com',force:'women',proxy:'rss2json'},
   {url:'https://news.google.com/rss/search?q=Panathinaikos+women&hl=en&gl=US&ceid=US:en',label:'Google News EN',source:'news.google.com',force:'women',proxy:'rss2json'},
@@ -210,17 +288,17 @@ function detectCat(text,forced){
 function getEmoji(c){return{football:'⚽',basketball:'🏀',volleyball:'🏐',tickets:'🎟️',women:'👩'}[c]||'🍀'}
 
 function getTag(text,cat){
-  if(cat==='women')return{tag:'ΓΥΝΑΙΚΕΙΟ',color:'#ec4899'};
+  if(cat==='women')return{tag:'ΓΥΝΑΙΚΕΙΟ',color:'#be185d'};
   const t=(text||'').toLowerCase();
-  if(t.includes('μεταγραφ')||t.includes('transfer')||t.includes('signing'))return{tag:'ΜΕΤΑΓΡΑΦΗ',color:'#f59e0b'};
+  if(t.includes('μεταγραφ')||t.includes('transfer')||t.includes('signing'))return{tag:'ΜΕΤΑΓΡΑΦΗ',color:'#d97706'};
   if(t.includes('τραυματ')||t.includes('injur'))return{tag:'ΤΡΑΥΜΑΤΙΣΜΟΣ',color:'#ef4444'};
-  if(has(text,TICKET_W))return{tag:'TICKET',color:'#22c55e'};
-  if(t.includes('νίκη')||t.includes('wins')||t.includes('victory'))return{tag:'ΝΙΚΗ',color:'#22c55e'};
-  if(t.includes('ήττα')||t.includes('loses'))return{tag:'ΗΤΤΑ',color:'#ef4444'};
-  if(t.includes('επίσημ')||t.includes('official'))return{tag:'ΕΠΙΣΗΜΟ',color:'#8b5cf6'};
-  if(t.includes('breaking'))return{tag:'BREAKING',color:'#ef4444'};
-  if(t.includes('δηλώσεις')||t.includes('statement'))return{tag:'ΔΗΛΩΣΕΙΣ',color:'#a78bfa'};
-  return{tag:'ΕΙΔΗΣΗ',color:'#3b82f6'};
+  if(has(text,TICKET_W))return{tag:'TICKET',color:'#059669'};
+  if(t.includes('νίκη')||t.includes('wins')||t.includes('victory'))return{tag:'ΝΙΚΗ',color:'#16a34a'};
+  if(t.includes('ήττα')||t.includes('loses'))return{tag:'ΗΤΤΑ',color:'#dc2626'};
+  if(t.includes('επίσημ')||t.includes('official'))return{tag:'ΕΠΙΣΗΜΟ',color:'#7c3aed'};
+  if(t.includes('breaking'))return{tag:'BREAKING',color:'#dc2626'};
+  if(t.includes('δηλώσεις')||t.includes('statement'))return{tag:'ΔΗΛΩΣΕΙΣ',color:'#6d28d9'};
+  return{tag:'ΕΙΔΗΣΗ',color:'#1a7a3c'};
 }
 
 function timeAgo(d){
@@ -251,12 +329,13 @@ async function fetchFeed(feed){
       seenUrls.add(link);
       const cat=detectCat(full,feed.force);
       const{tag,color}=getTag(full,cat);
+      const image=item.thumbnail||item.enclosure?.link||'';
       items.push({
         id:link,category:cat,tag,tagColor:color,
         title,summary:desc.slice(0,200)+(desc.length>200?'...':''),
         fullContent:desc,source:feed.source,sourceLabel:feed.label,
         time:timeAgo(item.pubDate),pubDate:item.pubDate||new Date().toISOString(),
-        link,isNew:true
+        link,isNew:true,image
       });
     }
     return items;
@@ -270,7 +349,7 @@ async function fetchAllNews(){
   const icon=document.getElementById('refreshIcon');
   const text=document.getElementById('refreshText');
   btn.disabled=true;icon.className='spin';text.textContent='Σκανάρει...';
-  if(allNews.length===0)document.getElementById('feed').innerHTML='<div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>';
+  if(allNews.length===0)document.getElementById('feed').innerHTML='<div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>';
   const prevCount=allNews.length;
   seenUrls=new Set(allNews.map(n=>n.id));
   const results=await Promise.allSettled(FEEDS.map(fetchFeed));
@@ -291,7 +370,7 @@ async function fetchAllNews(){
     setTimeout(()=>al.style.display='none',6000);
   }
   const now=new Date().toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('statusBar').innerHTML=`<span style="color:#4ade80" class="blink">●</span> Ενημέρωση: ${now} · ${allNews.length} άρθρα${added>0&&prevCount>0?` · <span style="color:#4ade80;font-weight:700">+${added} νέα!</span>`:''} · Επόμενη σε 5 λεπτά`;
+  document.getElementById('statusBar').innerHTML=`<span class="blink" style="color:var(--green)">●</span> Ενημέρωση: ${now} · ${allNews.length} άρθρα${added>0&&prevCount>0?` · <span style="color:var(--green);font-weight:700">+${added} νέα!</span>`:''} · Επόμενη σε 5 λεπτά`;
   const tp=document.getElementById('timerProgress');
   tp.style.transition='none';tp.style.width='100%';
   setTimeout(()=>{tp.style.transition='width 300s linear';tp.style.width='0%'},100);
@@ -304,23 +383,22 @@ function renderFeed(){
   const feed=document.getElementById('feed');
   if(filtered.length===0){feed.innerHTML='<div class="empty">Δεν βρέθηκαν νέα.<br>Δοκίμασε ανανέωση!</div>';return}
   feed.innerHTML=filtered.map((item,i)=>`
-    <div class="card ${i<3?'hot':''} ${item.isNew?'isnew':''} ${item.category==='women'?'women-card':''}" style="animation-delay:${Math.min(i*0.03,0.6)}s">
-      <div class="card-emoji">${getEmoji(item.category)}</div>
+    <div class="card ${i<3?'hot':''}" style="animation-delay:${Math.min(i*0.03,0.6)}s" onclick="openModal('${encodeURIComponent(item.id)}')">
+      <div class="card-num">${String(i+1).padStart(2,'0')}</div>
       <div class="card-body">
         <div class="card-tags">
-          <span class="tag" style="color:${item.tagColor};background:${item.tagColor}18;border:1px solid ${item.tagColor}35">${item.tag}</span>
+          <span class="tag" style="background:${item.tagColor}18;color:${item.tagColor};border:1px solid ${item.tagColor}40">${item.tag}</span>
           ${i<3?'<span class="hot-badge">🔥 HOT</span>':''}
           ${item.isNew?'<span class="new-badge">● NEW</span>':''}
         </div>
         <div class="card-title">${item.title}</div>
         <div class="card-summary">${item.summary}</div>
         <div class="card-meta">
-          <span>📎 ${item.sourceLabel}</span>
+          <span>${getEmoji(item.category)} ${item.sourceLabel}</span>
           <span>🕐 ${item.time}</span>
-          <button class="read-btn" onclick="openModal('${encodeURIComponent(item.id)}')">▶ Διάβασε εδώ</button>
-          <a class="orig-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">🔗 Πηγή</a>
         </div>
       </div>
+      ${item.image?`<img class="card-img" src="${item.image}" alt="" onerror="this.style.display='none'">`:`<div class="card-img-placeholder">${getEmoji(item.category)}</div>`}
     </div>
   `).join('');
 }
@@ -336,7 +414,13 @@ function openModal(encodedId){
   const id=decodeURIComponent(encodedId);
   const item=allNews.find(n=>n.id===id);
   if(!item)return;
-  document.getElementById('modalTags').innerHTML=`<span class="tag" style="color:${item.tagColor};background:${item.tagColor}18;border:1px solid ${item.tagColor}35">${item.tag}</span><span style="font-size:11px;color:#6b7280;font-family:'Barlow Condensed'">${getEmoji(item.category)} ${item.sourceLabel}</span>`;
+  const imgEl=document.getElementById('modalImg');
+  if(item.image){
+    imgEl.innerHTML=`<img class="modal-img" src="${item.image}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=modal-img-placeholder>${getEmoji(item.category)}</div>'">`;
+  }else{
+    imgEl.innerHTML=`<div class="modal-img-placeholder">${getEmoji(item.category)}</div>`;
+  }
+  document.getElementById('modalTags').innerHTML=`<span class="tag" style="background:${item.tagColor}18;color:${item.tagColor};border:1px solid ${item.tagColor}40">${item.tag}</span><span style="font-size:11px;color:#8aaa96;font-family:'Syne'">${getEmoji(item.category)} ${item.sourceLabel}</span>`;
   document.getElementById('modalTitle').textContent=item.title;
   document.getElementById('modalMeta').innerHTML=`<span>🕐 ${item.time}</span><span>📎 ${item.source}</span>`;
   document.getElementById('modalBody').textContent=item.fullContent||item.summary||'Κλικ παρακάτω για να διαβάσεις ολόκληρο το άρθρο.';
